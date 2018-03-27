@@ -4,7 +4,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "cd packages/react-scripts && node bin/react-scripts.js build",
+    "build": "cd packages/react-scripts && node bin/react-scripts-ts.js build",
     "changelog": "lerna-changelog",
     "create-react-app": "node tasks/cra.js",
     "e2e": "tasks/e2e-simple.sh",
@@ -13,8 +13,8 @@
     "publish": "tasks/publish.sh",
     "screencast": "node ./tasks/screencast.js",
     "screencast:error": "svg-term --cast jyu19xGl88FQ3poMY8Hbmfw8y --out screencast-error.svg --window --at 12000 --no-cursor",
-    "start": "cd packages/react-scripts && node bin/react-scripts.js start",
-    "test": "cd packages/react-scripts && node bin/react-scripts.js test --env=jsdom",
+    "start": "cd packages/react-scripts && node bin/react-scripts-ts.js start",
+    "test": "cd packages/react-scripts && node bin/react-scripts-ts.js test --env=jsdom",
     "format": "prettier --trailing-comma es5 --single-quote --write 'packages/*/*.js' 'packages/*/!(node_modules)/**/*.js'",
     "precommit": "lint-staged"
   },
