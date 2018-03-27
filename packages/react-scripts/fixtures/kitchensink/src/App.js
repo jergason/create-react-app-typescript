@@ -77,6 +77,11 @@ class App extends Component {
         import('./features/webpack/CssInclusion').then(f =>
           this.setFeature(f.default));
         break;
+      case 'css-modules-inclusion':
+        import('./features/webpack/CssModulesInclusion').then(f =>
+          this.setFeature(f.default)
+        );
+        break;
       case 'custom-interpolation':
         import(
           './features/syntax/CustomInterpolation'
@@ -98,6 +103,11 @@ class App extends Component {
       case 'generators':
         import('./features/syntax/Generators').then(f =>
           this.setFeature(f.default));
+        break;
+      case 'graphql-inclusion':
+        import('./features/webpack/GraphQLInclusion').then(f =>
+          this.setFeature(f.default)
+        );
         break;
       case 'image-inclusion':
         import('./features/webpack/ImageInclusion').then(f =>
@@ -151,6 +161,16 @@ class App extends Component {
         import('./features/webpack/SvgInclusion').then(f =>
           this.setFeature(f.default));
         break;
+      case 'svg-component':
+        import('./features/webpack/SvgComponent').then(f =>
+          this.setFeature(f.default)
+        );
+        break;
+      case 'svg-in-css':
+        import('./features/webpack/SvgInCss').then(f =>
+          this.setFeature(f.default)
+        );
+        break;
       case 'template-interpolation':
         import(
           './features/syntax/TemplateInterpolation'
@@ -160,6 +180,11 @@ class App extends Component {
         import(
           './features/webpack/UnknownExtInclusion'
         ).then(f => this.setFeature(f.default));
+        break;
+      case 'expand-env-variables':
+        import('./features/env/ExpandEnvVariables').then(f =>
+          this.setFeature(f.default)
+        );
         break;
       default:
         throw new Error(`Missing feature "${feature}"`);

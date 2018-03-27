@@ -64,18 +64,15 @@ export function startReportingRuntimeErrors(options: RuntimeReportingOptions) {
     );
   }
   currentRuntimeErrorOptions = options;
-  listenToRuntimeErrors(
-    errorRecord => {
-      try {
-        if (typeof options.onError === 'function') {
-          options.onError.call(null);
-        }
-      } finally {
-        handleRuntimeError(errorRecord);
+  stopListeningToRuntimeErrors = listenToRuntimeErrors(errorRecord => {
+    try {
+      if (typeof options.onError === 'function') {
+        options.onError.call(null);
       }
-    },
-    options.filename
-  );
+    } finally {
+      handleRuntimeError(errorRecord);
+    }
+  }, options.filename);
 }
 
 function handleRuntimeError(errorRecord) {
@@ -83,14 +80,14 @@ function handleRuntimeError(errorRecord) {
     currentRuntimeErrorRecords.some(({ error }) => error === errorRecord.error)
   ) {
     // Deduplicate identical errors.
-    // This fixes https://github.com/facebookincubator/create-react-app/issues/3011.
+    // This fixes https://github.com/facebook/create-react-app/issues/3011.
     return;
   }
   currentRuntimeErrorRecords = currentRuntimeErrorRecords.concat([errorRecord]);
   update();
 }
 
-function dismissRuntimeErrors() {
+export function dismissRuntimeErrors() {
   currentRuntimeErrorRecords = [];
   update();
 }

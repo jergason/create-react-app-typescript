@@ -30,23 +30,41 @@ const COMMON_EDITORS_OSX = {
   '/Applications/Atom.app/Contents/MacOS/Atom': 'atom',
   '/Applications/Atom Beta.app/Contents/MacOS/Atom Beta': '/Applications/Atom Beta.app/Contents/MacOS/Atom Beta',
   '/Applications/Brackets.app/Contents/MacOS/Brackets': 'brackets',
-  '/Applications/Sublime Text.app/Contents/MacOS/Sublime Text': '/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl',
-  '/Applications/Sublime Text 2.app/Contents/MacOS/Sublime Text 2': '/Applications/Sublime Text 2.app/Contents/SharedSupport/bin/subl',
+  '/Applications/Sublime Text.app/Contents/MacOS/Sublime Text':
+    '/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl',
+  '/Applications/Sublime Text Dev.app/Contents/MacOS/Sublime Text':
+    '/Applications/Sublime Text Dev.app/Contents/SharedSupport/bin/subl',
+  '/Applications/Sublime Text 2.app/Contents/MacOS/Sublime Text 2':
+    '/Applications/Sublime Text 2.app/Contents/SharedSupport/bin/subl',
   '/Applications/Visual Studio Code.app/Contents/MacOS/Electron': 'code',
-  '/Applications/AppCode.app/Contents/MacOS/appcode': '/Applications/AppCode.app/Contents/MacOS/appcode',
-  '/Applications/CLion.app/Contents/MacOS/clion': '/Applications/CLion.app/Contents/MacOS/clion',
-  '/Applications/IntelliJ IDEA.app/Contents/MacOS/idea': '/Applications/IntelliJ IDEA.app/Contents/MacOS/idea',
-  '/Applications/PhpStorm.app/Contents/MacOS/phpstorm': '/Applications/PhpStorm.app/Contents/MacOS/phpstorm',
-  '/Applications/PyCharm.app/Contents/MacOS/pycharm': '/Applications/PyCharm.app/Contents/MacOS/pycharm',
-  '/Applications/PyCharm CE.app/Contents/MacOS/pycharm': '/Applications/PyCharm CE.app/Contents/MacOS/pycharm',
-  '/Applications/RubyMine.app/Contents/MacOS/rubymine': '/Applications/RubyMine.app/Contents/MacOS/rubymine',
-  '/Applications/WebStorm.app/Contents/MacOS/webstorm': '/Applications/WebStorm.app/Contents/MacOS/webstorm',
+  '/Applications/Visual Studio Code - Insiders.app/Contents/MacOS/Electron':
+    'code-insiders',
+  '/Applications/AppCode.app/Contents/MacOS/appcode':
+    '/Applications/AppCode.app/Contents/MacOS/appcode',
+  '/Applications/CLion.app/Contents/MacOS/clion':
+    '/Applications/CLion.app/Contents/MacOS/clion',
+  '/Applications/IntelliJ IDEA.app/Contents/MacOS/idea':
+    '/Applications/IntelliJ IDEA.app/Contents/MacOS/idea',
+  '/Applications/PhpStorm.app/Contents/MacOS/phpstorm':
+    '/Applications/PhpStorm.app/Contents/MacOS/phpstorm',
+  '/Applications/PyCharm.app/Contents/MacOS/pycharm':
+    '/Applications/PyCharm.app/Contents/MacOS/pycharm',
+  '/Applications/PyCharm CE.app/Contents/MacOS/pycharm':
+    '/Applications/PyCharm CE.app/Contents/MacOS/pycharm',
+  '/Applications/RubyMine.app/Contents/MacOS/rubymine':
+    '/Applications/RubyMine.app/Contents/MacOS/rubymine',
+  '/Applications/WebStorm.app/Contents/MacOS/webstorm':
+    '/Applications/WebStorm.app/Contents/MacOS/webstorm',
+  '/Applications/MacVim.app/Contents/MacOS/MacVim': 'mvim',
+  '/Applications/GoLand.app/Contents/MacOS/goland':
+    '/Applications/GoLand.app/Contents/MacOS/goland',
 };
 
 const COMMON_EDITORS_LINUX = {
   atom: 'atom',
   Brackets: 'brackets',
   code: 'code',
+  'code-insiders': 'code-insiders',
   emacs: 'emacs',
   'idea.sh': 'idea',
   'phpstorm.sh': 'phpstorm',
@@ -55,11 +73,13 @@ const COMMON_EDITORS_LINUX = {
   sublime_text: 'sublime_text',
   vim: 'vim',
   'webstorm.sh': 'webstorm',
+  'goland.sh': 'goland',
 };
 
 const COMMON_EDITORS_WIN = [
   'Brackets.exe',
   'Code.exe',
+  'Code - Insiders.exe',
   'atom.exe',
   'sublime_text.exe',
   'notepad++.exe',
@@ -75,6 +95,8 @@ const COMMON_EDITORS_WIN = [
   'rubymine64.exe',
   'webstorm.exe',
   'webstorm64.exe',
+  'goland.exe',
+  'goland64.exe',
 ];
 
 function addWorkspaceToArgumentsIfExists(args, workspace) {
@@ -84,7 +106,13 @@ function addWorkspaceToArgumentsIfExists(args, workspace) {
   return args;
 }
 
-function getArgumentsForLineNumber(editor, fileName, lineNumber, workspace) {
+function getArgumentsForLineNumber(
+  editor,
+  fileName,
+  lineNumber,
+  colNumber,
+  workspace
+) {
   const editorBasename = path.basename(editor).replace(/\.(exe|cmd|bat)$/i, '');
   switch (editorBasename) {
     case 'atom':
@@ -93,25 +121,29 @@ function getArgumentsForLineNumber(editor, fileName, lineNumber, workspace) {
     case 'subl':
     case 'sublime':
     case 'sublime_text':
+      return [fileName + ':' + lineNumber + ':' + colNumber];
     case 'wstorm':
     case 'charm':
       return [fileName + ':' + lineNumber];
     case 'notepad++':
-      return ['-n' + lineNumber, fileName];
+      return ['-n' + lineNumber, '-c' + colNumber, fileName];
     case 'vim':
     case 'mvim':
     case 'joe':
+      return ['+' + lineNumber, fileName];
     case 'emacs':
     case 'emacsclient':
-      return ['+' + lineNumber, fileName];
+      return ['+' + lineNumber + ':' + colNumber, fileName];
     case 'rmate':
     case 'mate':
     case 'mine':
       return ['--line', lineNumber, fileName];
     case 'code':
     case 'Code':
+    case 'code-insiders':
+    case 'Code - Insiders':
       return addWorkspaceToArgumentsIfExists(
-        ['-g', fileName + ':' + lineNumber],
+        ['-g', fileName + ':' + lineNumber + ':' + colNumber],
         workspace
       );
     case 'appcode':
@@ -127,6 +159,8 @@ function getArgumentsForLineNumber(editor, fileName, lineNumber, workspace) {
     case 'rubymine64':
     case 'webstorm':
     case 'webstorm64':
+    case 'goland':
+    case 'goland64':
       return addWorkspaceToArgumentsIfExists(
         ['--line', lineNumber, fileName],
         workspace
@@ -159,23 +193,19 @@ function guessEditor() {
         }
       }
     } else if (process.platform === 'win32') {
+      // Some processes need elevated rights to get its executable path.
+      // Just filter them out upfront. This also saves 10-20ms on the command.
       const output = child_process
-        .execSync('powershell -Command "Get-Process | Select-Object Path"', {
-          stdio: ['pipe', 'pipe', 'ignore'],
-        })
+        .execSync(
+          'wmic process where "executablepath is not null" get executablepath'
+        )
         .toString();
       const runningProcesses = output.split('\r\n');
       for (let i = 0; i < runningProcesses.length; i++) {
-        // `Get-Process` sometimes returns empty lines
-        if (!runningProcesses[i]) {
-          continue;
-        }
-
-        const fullProcessPath = runningProcesses[i].trim();
-        const shortProcessName = path.basename(fullProcessPath);
-
-        if (COMMON_EDITORS_WIN.indexOf(shortProcessName) !== -1) {
-          return [fullProcessPath];
+        const processPath = runningProcesses[i].trim();
+        const processName = path.basename(processPath);
+        if (COMMON_EDITORS_WIN.indexOf(processName) !== -1) {
+          return [processPath];
         }
       }
     } else if (process.platform === 'linux') {
@@ -234,20 +264,32 @@ function printInstructions(fileName, errorMessage) {
 }
 
 let _childProcess = null;
-function launchEditor(fileName, lineNumber) {
+function launchEditor(fileName, lineNumber, colNumber) {
   if (!fs.existsSync(fileName)) {
     return;
   }
 
   // Sanitize lineNumber to prevent malicious use on win32
   // via: https://github.com/nodejs/node/blob/c3bb4b1aa5e907d489619fb43d233c3336bfc03d/lib/child_process.js#L333
-  if (lineNumber && isNaN(lineNumber)) {
+  // and it should be a positive integer
+  if (!(Number.isInteger(lineNumber) && lineNumber > 0)) {
     return;
   }
 
+  // colNumber is optional, but should be a positive integer too
+  // default is 1
+  if (!(Number.isInteger(colNumber) && colNumber > 0)) {
+    colNumber = 1;
+  }
+
   let [editor, ...args] = guessEditor();
+
   if (!editor) {
     printInstructions(fileName, null);
+    return;
+  }
+
+  if (editor.toLowerCase() === 'none') {
     return;
   }
 
@@ -268,7 +310,13 @@ function launchEditor(fileName, lineNumber) {
   let workspace = null;
   if (lineNumber) {
     args = args.concat(
-      getArgumentsForLineNumber(editor, fileName, lineNumber, workspace)
+      getArgumentsForLineNumber(
+        editor,
+        fileName,
+        lineNumber,
+        colNumber,
+        workspace
+      )
     );
   } else {
     args.push(fileName);
